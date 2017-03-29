@@ -11,8 +11,6 @@ public class Skiplist {
 	private ReadWriteLock lock;
 	private final int MAX_HEIGHT;
 	
-	boolean bad = false;
-	
 	private static final int SEQUENTIAL_INSERTIONS_OVERLOAD = 1000;
 	private static final int SEQUENTIAL_INSERTIONS_UNDERLOAD = 100;
 	private static final int MIN_SEQUENTIAL_ELEMENTS_TO_ADD = 8;
@@ -28,9 +26,6 @@ public class Skiplist {
 		headSeq = new BucketNode(Integer.MIN_VALUE, h);
 		headPar = new BucketNode(Integer.MAX_VALUE, h);
 		tail = new BucketNode(Integer.MAX_VALUE, h);
-		//headSeq.counter.decrementAndGet();
-		//headPar.counter.decrementAndGet();
-		//tail.counter.decrementAndGet();
 		for(int i = 0; i < h; i++) {
 			headSeq.next[i] = new AtomicReference<BucketNode>(tail);
 			headPar.next[i] = new AtomicReference<BucketNode>(tail);
@@ -39,7 +34,6 @@ public class Skiplist {
 	}
 	
 	public int removeSeq() {
-		//System.out.println("removeSeq");
 		if(minValue.get() == Integer.MAX_VALUE)
 			return Integer.MAX_VALUE;
 		
@@ -68,11 +62,9 @@ public class Skiplist {
 	
 	public void addSeq(int v) {
 		seqInsertions.incrementAndGet();
-		if(currSeq == null)
-			currSeq = headSeq;
 		
 		BucketNode[] preds = new BucketNode[MAX_HEIGHT], succs = new BucketNode[MAX_HEIGHT];
-		BucketNode node = find(headSeq, v, preds, succs, false);
+		BucketNode node = find(headSeq, v, preds, succs);
 		if(node != null) {
 			node.counter.incrementAndGet();
 			return;
@@ -96,7 +88,7 @@ public class Skiplist {
 	
 	private Tuple<BucketNode, Boolean> cleanFind(int v, BucketNode[] preds, BucketNode[] succs) {
 		int t = lockTimestamp.get();
-		BucketNode b = find(headPar, v, preds, succs, true);
+		BucketNode b = find(headPar, v, preds, succs);
 		lock.readLock().lock();
 		if(t < lockTimestamp.get()) {
 			lock.readLock().unlock();
@@ -177,8 +169,6 @@ public class Skiplist {
 			}
 			pred = curr;
 			curr = curr.next[0].get();
-			if(pred.key > curr.key)
-				bad = true;
 		}
 		
 		if(i == 0) {
@@ -198,7 +188,8 @@ public class Skiplist {
 			headSeq.next[i] = new AtomicReference<BucketNode>(headPar.next[i].get());
 		
 		BucketNode[] preds = new BucketNode[MAX_HEIGHT], succs = new BucketNode[MAX_HEIGHT];
-		find(headSeq, lastSeq.get().key + 1, preds, succs, false);
+		find(headSeq, lastSeq.get().key + 1, preds, succs);
+		find(headSeq, lastSeq.get().key, new BucketNode[MAX_HEIGHT], succs);
 		for(i = MAX_HEIGHT - 1; i >= 0; i--) {
 			preds[i].next[i] = new AtomicReference<BucketNode>(tail);
 			headPar.next[i] = new AtomicReference<BucketNode>(succs[i]);
@@ -227,8 +218,8 @@ public class Skiplist {
 			return false;
 		
 		BucketNode[] preds = new BucketNode[MAX_HEIGHT], succs = new BucketNode[MAX_HEIGHT];
-		find(headSeq, lastSeq.get().key + 1, preds, succs, false);
-		find(headSeq, currSeq.key, new BucketNode[MAX_HEIGHT], succs, false);
+		find(headSeq, lastSeq.get().key + 1, preds, succs);
+		find(headSeq, currSeq.key, new BucketNode[MAX_HEIGHT], succs);
 		
 		lock.writeLock().lock();
 		
@@ -247,7 +238,7 @@ public class Skiplist {
 		return true;
 	}
 	
-	private BucketNode find(BucketNode head, int v, BucketNode[] preds, BucketNode[] succs, boolean par) {
+	private BucketNode find(BucketNode head, int v, BucketNode[] preds, BucketNode[] succs) {
 		int h = MAX_HEIGHT - 1;
 		while(h >= 0) {
 			BucketNode next = head.next[h].get();

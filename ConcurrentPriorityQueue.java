@@ -2,6 +2,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class ConcurrentPriorityQueue implements IPriorityQueue {
     PriorityBlockingQueue<Integer> pq;
+    
     public ConcurrentPriorityQueue() {
         pq = new PriorityBlockingQueue<Integer>();
     }

@@ -14,10 +14,7 @@ public class Main {
         for(int i = 0; i < numTests; i++ ) {
             System.out.print((i == 0 ? "" : ",") + PriorityQueueTester.RunTest(numThreads, opMix, numOperations, new ConcurrentPriorityQueue()));
         }
-        /*System.out.println("\nPaper-5h: ");
-        for(int i = 0; i < numTests; i++ ) {
-            System.out.print((i == 0 ? "" : ",") + PriorityQueueTester.RunTest(numThreads, opMix, numOperations, new PaperPriorityQueue(5)));
-        }*/
+        
         System.out.println("\nPaper-23h: ");
         for(int i = 0; i < numTests; i++ ) {
             System.out.print((i == 0 ? "" : ",") + PriorityQueueTester.RunTest(numThreads, opMix, numOperations, new PaperPriorityQueue(23)));

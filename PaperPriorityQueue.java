@@ -7,9 +7,9 @@ public class PaperPriorityQueue implements IPriorityQueue {
 	private AtomicInteger uniqueStamp, addOps;
 	private Server server;
 	
-	private final int ELIM_SIZE = 100;
-	private final int MAX_ELIM_MIN = 200;
-	private final int MAX_ELIM = 1000;
+	private final int ELIM_SIZE = 5;
+	private final int MAX_ELIM_MIN = 5;
+	private final int MAX_ELIM = 10;
 	
 	public final int EMPTY = Integer.MIN_VALUE;
 	public final int REMREQ = Integer.MIN_VALUE + 1;
@@ -99,6 +99,8 @@ public class PaperPriorityQueue implements IPriorityQueue {
 					return true;
 				}
 			}
+			
+			pos = (pos + 1) % ELIM_SIZE;
 		}
 	}
 	
