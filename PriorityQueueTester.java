@@ -1,8 +1,14 @@
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * A tester for a priority queue given some test parameters
+ * @author Ryan Kelsey and Lee Berman
+ *
+ */
 public class PriorityQueueTester implements Runnable {
-    private static final int minGenerate = 0;
-    private static final int maxGenerate = 10000 + 1;
+    private static final int MIN_GENERATE = 0;
+    private static final int MAX_GENERATE = 10000 + 1;
+    private static final boolean DEBUG = false;
     
     private int threadId;
     private double operationMix; //0-1, higher = more additions
@@ -16,7 +22,15 @@ public class PriorityQueueTester implements Runnable {
         this.queueObject = queueObject;
     }
 
-    public static long RunTest(int numThreads, double operationMix, int numOperations, IPriorityQueue queueObject) {
+    /**
+     * Runs a test on the given priority queue
+     * @param numThreads The number of threads to use
+     * @param operationMix The operation mix to use
+     * @param numOperations The number of operations
+     * @param queueObject The queue to test with
+     * @return The time taken for the test, in milliseconds
+     */
+    public static long runTest(int numThreads, double operationMix, int numOperations, IPriorityQueue queueObject) {
         int numOperationsPerThread = numOperations / numThreads;
         Thread[] threads = new Thread[numThreads];
 
@@ -43,13 +57,16 @@ public class PriorityQueueTester implements Runnable {
         return end - start;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
     public void run() {
         long addSum = 0;
         long remSum = 0;
         int numAdded = 0;
         for(int i = 0; i < numOperationsPerThread; i++) {
             if(numAdded <= 0 || ThreadLocalRandom.current().nextDouble(1) < operationMix) {
-                int v = ThreadLocalRandom.current().nextInt(minGenerate, maxGenerate);
+                int v = ThreadLocalRandom.current().nextInt(MIN_GENERATE, MAX_GENERATE);
                 queueObject.add(v, threadId);
                 addSum += v;
                 numAdded++;
@@ -59,6 +76,8 @@ public class PriorityQueueTester implements Runnable {
                 numAdded--;
             }
         }
-        //System.out.println("Thread " + threadId + " ended with addSum = " + addSum + ", remSum = " + remSum + ", diff = " + (addSum - remSum));
+        
+        if(DEBUG)
+        	System.out.println("Thread " + threadId + " ended with addSum = " + addSum + ", remSum = " + remSum + ", diff = " + (addSum - remSum));
     }
 }
