@@ -59,6 +59,6 @@ public class PriorityQueueTester implements Runnable {
                 numAdded--;
             }
         }
-        System.out.println("Thread " + threadId + " ended with addSum = " + addSum + ", remSum = " + remSum + ", diff = " + (addSum - remSum));
+        //System.out.println("Thread " + threadId + " ended with addSum = " + addSum + ", remSum = " + remSum + ", diff = " + (addSum - remSum));
     }
 }
