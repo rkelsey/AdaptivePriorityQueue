@@ -9,10 +9,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Ryan Kelsey and Lee Berman
  *
  */
-/**
- * @author ryank
- *
- */
 public class Skiplist {
 	private AtomicInteger lockTimestamp, minValue, seqElementsToAdd, seqInsertions;
 	private BucketNode headSeq, currSeq, headPar, tail;
